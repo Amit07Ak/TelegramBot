@@ -47,3 +47,13 @@ TelegramBot/
 ├── .env # Environment variables (NOT committed)
 ├── .gitignore
 
+
+---
+
+## 🤖 Create a Telegram Bot
+
+1. Open Telegram → **@BotFather**
+2. Run `/newbot`
+3. Save the **Bot Token**
+4. Disable privacy mode:
+
