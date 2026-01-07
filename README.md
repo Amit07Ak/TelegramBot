@@ -40,4 +40,10 @@ This design matches **real-world professional moderation bots** used in large Te
 ---
 
 ## 📂 Project Structure
+TelegramBot/
+├── bot.py # Automated moderation logic
+├── requirements.txt # Dependencies
+├── README.md # Documentation
+├── .env # Environment variables (NOT committed)
+├── .gitignore
 
