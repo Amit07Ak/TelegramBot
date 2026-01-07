@@ -77,3 +77,25 @@ Add the bot to your group and promote it as **Administrator** with:
 ```env
 TELEGRAM_TOKEN=your_telegram_bot_token_here
 
+Linux / macOS
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python bot.py
+
+Windows powershell
+
+python -m venv .venv
+. .\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python bot.py
+
+
+Configuration (Inside bot.py)
+
+SPAM_MSG_LIMIT = 5
+SPAM_TIME_WINDOW = 10  # seconds
+MUTE_DURATION = 300   # seconds
+BLOCK_LINKS = True
+
