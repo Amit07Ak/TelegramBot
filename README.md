@@ -57,3 +57,23 @@ TelegramBot/
 3. Save the **Bot Token**
 4. Disable privacy mode:
 
+
+---
+
+## 🔐 Required Bot Permissions
+
+Add the bot to your group and promote it as **Administrator** with:
+
+- ✅ Delete messages
+- ✅ Restrict members
+- ✅ Ban users (optional)
+- ✅ Pin messages (optional)
+
+---
+
+## ⚙️ Environment Setup
+
+### Create `.env` file
+```env
+TELEGRAM_TOKEN=your_telegram_bot_token_here
+
