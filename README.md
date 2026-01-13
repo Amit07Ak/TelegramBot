@@ -1,4 +1,4 @@
-# 🤖 Automated Telegram Moderation Bot (Python)
+# 🤖 Automated Telegram Moderation Bot (Python automation)
 
 A **professional, fully automated Telegram moderation bot** built with **Python** using the **`python-telegram-bot` v20+ async API**.
 
