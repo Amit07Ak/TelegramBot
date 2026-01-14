@@ -18,13 +18,13 @@ MAX_WARNINGS = 2             # after this → ban
 
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 
-# ========================================
+# ========================================#
 
 user_message_times = defaultdict(list)
 user_warnings = defaultdict(int)
 
 
-# ================= ADMIN CHECK =================
+# ================= ADMIN CHECK =================#
 
 async def is_admin(chat_id, user_id, context):
     try:
