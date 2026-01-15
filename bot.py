@@ -44,7 +44,7 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
 
 
-# ================= MAIN MODERATION =================
+# ================ MAIN MODERATION =================
 
 async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
