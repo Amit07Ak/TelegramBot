@@ -2,7 +2,7 @@ import os
 import time
 import logging
 from collections import defaultdict
-
+# dotenv to store token and some personal ids
 from dotenv import load_dotenv
 from telegram import Update, ChatPermissions
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
