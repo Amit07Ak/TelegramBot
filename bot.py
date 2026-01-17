@@ -34,7 +34,7 @@ async def is_admin(chat_id, user_id, context):
         return False
 
 
-# ================= WELCOME =================
+# ================= WELCOME ================= #
 
 async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for user in update.message.new_chat_members:
