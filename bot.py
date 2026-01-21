@@ -44,7 +44,7 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
 
 
-# ================ MAIN MODERATION =================
+# ================ MAIN MODERATION =================#
 
 async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
@@ -55,7 +55,7 @@ async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.lower()
     now = time.time()
 
-    # ---------- ADMIN IMMUNITY ----------
+    # ---------- ADMIN IMMUNITY ----------#
     if await is_admin(chat_id, user.id, context):
         try:
             await context.bot.pin_chat_message(chat_id, update.message.message_id)
