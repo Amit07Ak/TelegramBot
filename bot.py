@@ -95,7 +95,7 @@ async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_violation(update, context, "Spamming")
 
 
-# ================= VIOLATION HANDLER =================
+# ================= VIOLATION HANDLER =================#
 
 async def handle_violation(update, context, reason):
     chat_id = update.effective_chat.id
