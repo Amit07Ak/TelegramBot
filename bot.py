@@ -13,7 +13,7 @@ load_dotenv()
 
 SPAM_MSG_LIMIT = 5
 SPAM_TIME_WINDOW = 10
-MUTE_DURATION = 300          # 5 minutes
+MUTE_DURATION = 300          # 5 minutes 
 MAX_WARNINGS = 2             # after this → ban
 
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
