@@ -68,7 +68,7 @@ async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.delete()
         return
 
-    # ---------- HELP / URGENT ----------
+    # ---------- HELP / URGENT ----------#
     if any(k in text for k in ["help", "urgent", "important", "admin", "serious"]):
         if ADMIN_ID:
             await context.bot.send_message(
