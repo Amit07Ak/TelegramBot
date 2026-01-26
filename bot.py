@@ -10,7 +10,6 @@ from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filte
 load_dotenv()
 
 # ================== CONFIG =================#
-
 SPAM_MSG_LIMIT = 5
 SPAM_TIME_WINDOW = 10
 MUTE_DURATION = 300          # 5 minutes 
