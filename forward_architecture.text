@@ -1,0 +1,15 @@
+Private Channel (Content Pool)
+        ↓
+   Bot reads messages
+        ↓
+   Stores in memory / DB
+        ↓
+   Scheduler (every X minutes)
+        ↓
+   Sends to Group / Channel
+
+
+Content Channel
+ ├─ normal message → added to queue
+ ├─ #start → enable scheduler
+ ├─ #stop → disable scheduler

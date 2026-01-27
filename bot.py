@@ -127,6 +127,54 @@ async def handle_violation(update, context, reason):
         )
         user_warnings[user.id] = 0
 
+# unique feature implementation - auto forwarding messages from any specific channel to this channel
+
+posting_enabled = False
+scheduled_job = None
+
+async def collect_content(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global posting_enabled, scheduled_job
+
+    msg = update.channel_post
+    if not msg:
+        return
+
+    text = (msg.text or "").lower()
+
+    # START posting
+    if text == "#start":
+        if not posting_enabled:
+            posting_enabled = True
+            scheduled_job = context.job_queue.run_repeating(
+                send_next_content,
+                interval=300,
+                first=10
+            )
+        return
+
+    # STOP posting
+    if text == "#stop":
+        posting_enabled = False
+        if scheduled_job:
+            scheduled_job.schedule_removal()
+            scheduled_job = None
+        return
+
+    # Normal content
+    content_queue.append(msg)
+
+async def send_next_content(context: ContextTypes.DEFAULT_TYPE):
+    if not posting_enabled or not content_queue:
+        return
+
+    message = content_queue.pop(0)
+    await context.bot.copy_message(
+        chat_id=int(os.getenv("TARGET_CHAT_ID")),
+        from_chat_id=message.chat_id,
+        message_id=message.message_id
+    )
+
+
 
 # ================= MAIN =================
 
