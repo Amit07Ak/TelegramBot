@@ -15,6 +15,8 @@ Admins **do not need to type commands** for daily moderation.
 - 🧹 Removes command messages silently
 - 🛡️ Ignores admins (admin immunity)
 - ⏱️ Applies time-based restrictions
+- Auto forward message/videos/photos implemented .
+- After specific time-interval.
 
 This design matches **real-world professional moderation bots** used in large Telegram communities.
 

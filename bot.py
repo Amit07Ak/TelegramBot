@@ -202,9 +202,6 @@ async def send_next_content(context: ContextTypes.DEFAULT_TYPE):
 
     logging.info("Forwarded message %s", message.message_id)
 
-async def debug_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        print("UPDATE RECEIVED:", update.to_dict().keys())
-
 # ================= MAIN =================
 def main():
     logging.basicConfig(
@@ -225,7 +222,7 @@ def main():
  
     
 
-    app.add_handler(MessageHandler(filters.ALL, debug_all))
+    # app.add_handler(MessageHandler(filters.ALL, debug_all))
 
 
 if __name__ == "__main__":
