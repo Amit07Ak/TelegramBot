@@ -2,40 +2,57 @@ import os
 import time
 import logging
 from collections import defaultdict
-# dotenv to store token and some personal ids
+
 from dotenv import load_dotenv
 from telegram import Update, ChatPermissions
-from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
+from telegram.ext import (
+    ApplicationBuilder,
+    MessageHandler,
+    ContextTypes,
+    filters,
+)
 
+# ================= ENV =================
 load_dotenv()
 
-# ================= CONFIG =================#
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+TARGET_CHAT_ID = int(os.getenv("TARGET_CHAT_ID", "0"))
+
+if not TELEGRAM_TOKEN:
+    raise SystemExit("TELEGRAM_TOKEN not set")
+
+# ================= CONFIG =================
 SPAM_MSG_LIMIT = 5
 SPAM_TIME_WINDOW = 10
-MUTE_DURATION = 300          # 5 minutes 
+MUTE_DURATION = 300          # 5 minutes
 MAX_WARNINGS = 2             # after this → ban
+# ========================================
 
-ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-
-# ========================================#
-
+# ================= STATE =================
 user_message_times = defaultdict(list)
 user_warnings = defaultdict(int)
 
+content_queue = []           # 🔴 FIXED: was missing
+posting_enabled = False
+scheduled_job = None
+# ========================================
 
-# ================= ADMIN CHECK =================#
 
+# ================= ADMIN CHECK =================
 async def is_admin(chat_id, user_id, context):
     try:
         member = await context.bot.get_chat_member(chat_id, user_id)
         return member.status in ("administrator", "creator")
-    except:
+    except Exception:
         return False
 
 
-# ================= WELCOME ================= #
-
+# ================= WELCOME =================
 async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not update.message or not update.message.new_chat_members:
+        return
+
     for user in update.message.new_chat_members:
         await update.message.reply_text(
             f"👋 Welcome {user.first_name}!\n"
@@ -43,8 +60,7 @@ async def welcome_new_members(update: Update, context: ContextTypes.DEFAULT_TYPE
         )
 
 
-# ================ MAIN MODERATION =================#
-
+# ================= MAIN MODERATION =================
 async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.message or not update.message.text:
         return
@@ -54,20 +70,23 @@ async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.lower()
     now = time.time()
 
-    # ---------- ADMIN IMMUNITY ----------#
+    # ---------- ADMIN IMMUNITY ----------
     if await is_admin(chat_id, user.id, context):
         try:
             await context.bot.pin_chat_message(chat_id, update.message.message_id)
-        except:
+        except Exception:
             pass
         return
 
     # ---------- COMMAND CLEANUP ----------
     if text.startswith("/"):
-        await update.message.delete()
+        try:
+            await update.message.delete()
+        except Exception:
+            pass
         return
 
-    # ---------- HELP / URGENT ----------#
+    # ---------- HELP / URGENT ----------
     if any(k in text for k in ["help", "urgent", "important", "admin", "serious"]):
         if ADMIN_ID:
             await context.bot.send_message(
@@ -94,8 +113,7 @@ async def auto_moderation(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await handle_violation(update, context, "Spamming")
 
 
-# ================= VIOLATION HANDLER =================#
-
+# ================= VIOLATION HANDLER =================
 async def handle_violation(update, context, reason):
     chat_id = update.effective_chat.id
     user = update.effective_user
@@ -104,7 +122,7 @@ async def handle_violation(update, context, reason):
 
     try:
         await update.message.delete()
-    except:
+    except Exception:
         pass
 
     if user_warnings[user.id] <= MAX_WARNINGS:
@@ -127,11 +145,8 @@ async def handle_violation(update, context, reason):
         )
         user_warnings[user.id] = 0
 
-# unique feature implementation - auto forwarding messages from any specific channel to this channel
 
-posting_enabled = False
-scheduled_job = None
-
+# ================= CONTENT COLLECTOR =================
 async def collect_content(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global posting_enabled, scheduled_job
 
@@ -140,57 +155,77 @@ async def collect_content(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     text = (msg.text or "").lower()
+    logging.info("Channel post received: %s", text)
 
-    # START posting
+    # START
     if text == "#start":
         if not posting_enabled:
             posting_enabled = True
             scheduled_job = context.job_queue.run_repeating(
                 send_next_content,
-                interval=300,
+                interval=30,
                 first=10
             )
+            logging.info("Auto-posting STARTED")
         return
 
-    # STOP posting
+    # STOP
     if text == "#stop":
         posting_enabled = False
         if scheduled_job:
             scheduled_job.schedule_removal()
             scheduled_job = None
+        logging.info("Auto-posting STOPPED")
         return
 
-    # Normal content
+    # NORMAL CONTENT
     content_queue.append(msg)
+    logging.info("Content queued. Queue size=%s", len(content_queue))
 
+
+# ================= SENDER =================
 async def send_next_content(context: ContextTypes.DEFAULT_TYPE):
     if not posting_enabled or not content_queue:
         return
 
+    if TARGET_CHAT_ID == 0:
+        logging.warning("TARGET_CHAT_ID not set")
+        return
+
     message = content_queue.pop(0)
+
     await context.bot.copy_message(
-        chat_id=int(os.getenv("TARGET_CHAT_ID")),
+        chat_id=TARGET_CHAT_ID,
         from_chat_id=message.chat_id,
         message_id=message.message_id
     )
 
+    logging.info("Forwarded message %s", message.message_id)
 
+async def debug_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        print("UPDATE RECEIVED:", update.to_dict().keys())
 
 # ================= MAIN =================
-
 def main():
-    token = os.getenv("TELEGRAM_TOKEN")
-    if not token:
-        raise SystemExit("TELEGRAM_TOKEN not set")
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(levelname)s - %(message)s"
+    )
 
-    logging.basicConfig(level=logging.INFO)
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-    app = ApplicationBuilder().token(token).build()
-
+    # Group moderation
     app.add_handler(MessageHandler(filters.StatusUpdate.NEW_CHAT_MEMBERS, welcome_new_members))
-    app.add_handler(MessageHandler(filters.TEXT, auto_moderation))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.ChatType.CHANNEL, auto_moderation))
 
-    app.run_polling()
+    # Channel content collection  🔴 FIXED: handler was missing
+    app.add_handler(MessageHandler(filters.ChatType.CHANNEL, collect_content))
+
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
+ 
+    
+
+    app.add_handler(MessageHandler(filters.ALL, debug_all))
 
 
 if __name__ == "__main__":

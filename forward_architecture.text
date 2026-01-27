@@ -12,4 +12,5 @@ Private Channel (Content Pool)
 Content Channel
  ├─ normal message → added to queue
  ├─ #start → enable scheduler
- ├─ #stop → disable scheduler
+ ├─ #stop → disable scheduler  
+ 
