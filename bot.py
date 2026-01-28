@@ -12,7 +12,7 @@ from telegram.ext import (
     filters,
 )
 
-# ================= ENV =================
+# ================= ENV ================
 load_dotenv()
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
