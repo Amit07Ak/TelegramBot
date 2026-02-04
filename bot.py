@@ -22,7 +22,7 @@ TARGET_CHAT_ID = int(os.getenv("TARGET_CHAT_ID", "0"))
 if not TELEGRAM_TOKEN:
     raise SystemExit("TELEGRAM_TOKEN not set")
 
-# ================= CONFIG =================
+# ================= CONFIG ==================
 SPAM_MSG_LIMIT = 5
 SPAM_TIME_WINDOW = 10
 MUTE_DURATION = 300          # 5 minutes
