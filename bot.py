@@ -36,7 +36,7 @@ user_warnings = defaultdict(int)
 content_queue = []           # 🔴 FIXED: was missing
 posting_enabled = False
 scheduled_job = None
-# ========================================
+# =========================================
 
 
 # ================= ADMIN CHECK =================
